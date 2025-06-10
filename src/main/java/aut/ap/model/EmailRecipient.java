@@ -1,4 +1,65 @@
 package aut.ap.model;
 
-public class emailRecipient {
+import aut.ap.framwork.MilouEntity;
+import jakarta.persistence.*;
+
+@Entity
+@Table (name = "email_recipient")
+public class EmailRecipient extends MilouEntity {
+    public enum Status {
+        unread,
+        read
+    }
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "email_id")
+    private Email email;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn (name = "recipient_id")
+    private User recipient;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status = Status.unread;
+
+    private EmailRecipient() {
+    }
+
+    public EmailRecipient(Email email, User recipientId, Status status) {
+        this.email = email;
+        this.recipient = recipientId;
+        this.status = status;
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public void setEmail(Email email) {
+        this.email = email;
+    }
+
+    public User getRecipient() {
+        return recipient;
+    }
+
+    public void setRecipient(User recipient) {
+        this.recipient = recipient;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+    @Override
+    public String toString() {
+        return "EmailRecipient{" +
+                "email=" + email +
+                ", recipient=" + recipient +
+                ", status=" + status +
+                ", id=" + getId() +
+                '}';
+    }
+
 }
