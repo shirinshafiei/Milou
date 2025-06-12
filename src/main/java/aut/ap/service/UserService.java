@@ -8,10 +8,10 @@ public class UserService {
         boolean emailExists = SingletonSessionFactory.get()
                 .fromTransaction(session ->
                         session.createQuery(
-                                        "select count(u) > 0 from users p where u.email = :email",
+                                        "select count(u) > 0 from User u where u.email = :email",
                                         Boolean.class
                                 )
-                                .setParameter("email", email)
+                                .setParameter("email", email )
                                 .getSingleResult()
                 );
         if (emailExists) {
