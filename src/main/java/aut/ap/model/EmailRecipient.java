@@ -10,23 +10,22 @@ public class EmailRecipient extends MilouEntity {
         unread,
         read
     }
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "email_id")
     private Email email;
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     @JoinColumn (name = "recipient_id")
     private User recipient;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status = Status.unread;
 
-    private EmailRecipient() {
+    public EmailRecipient() {
     }
 
-    public EmailRecipient(Email email, User recipientId, Status status) {
+    public EmailRecipient(Email email, User recipientId) {
         this.email = email;
         this.recipient = recipientId;
-        this.status = status;
     }
 
     public Email getEmail() {

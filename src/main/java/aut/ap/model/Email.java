@@ -22,11 +22,10 @@ public class Email extends MilouEntity {
      @Basic(optional = false)
      private String code;
 
-     private Email() {
+     public Email() {
      }
 
-     public Email(Date date, User sender, String subject, String body, String code) {
-          this.date = date;
+     public Email(User sender, String subject, String body, String code) {
           this.sender = sender;
           this.subject  = subject;
           this.body = body;

@@ -18,7 +18,7 @@ public class User extends MilouEntity {
     @Basic (optional = false)
     private String password;
 
-    private User() {
+    public User() {
     }
 
     public User (String name, String email, String password) {
