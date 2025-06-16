@@ -1,14 +1,37 @@
 package aut.ap;
 
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
+import aut.ap.framwork.SingletonSessionFactory;
+import aut.ap.ui.CLI;
+import aut.ap.ui.GUI;
+
+import javax.swing.*;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        SessionFactory sessionFactory = new Configuration()
-                .configure("hibernate.cfg.xml")
-                .buildSessionFactory();
+        System.out.println("Welcome to Milou Mail!");
+        System.out.println("Choose your interface: [1] CLI  |  [2] GUI");
+        System.out.print("Your choice: ");
 
-        sessionFactory.close();
+        Scanner scanner = new Scanner(System.in);
+        String choice = scanner.nextLine().trim();
+
+        try {
+            switch (choice) {
+                case "1":
+                    CLI cli = new CLI();
+                    cli.start();
+                    break;
+                case "2":
+                    GUI gui = new GUI();
+                    gui.start();
+                    break;
+                default:
+                    System.err.println("Invalid choice. Please restart the application.");
+                    return;
+            }
+        } finally {
+            Runtime.getRuntime().addShutdownHook(new Thread(SingletonSessionFactory::close));
+        }
     }
 }
