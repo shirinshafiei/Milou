@@ -10,10 +10,10 @@ public class EmailRecipient extends MilouEntity {
         unread,
         read
     }
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "email_id")
     private Email email;
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn (name = "recipient_id")
     private User recipient;
     @Enumerated(EnumType.STRING)
