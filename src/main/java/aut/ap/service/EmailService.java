@@ -4,9 +4,9 @@ import aut.ap.framwork.SingletonSessionFactory;
 import aut.ap.model.Email;
 import aut.ap.model.EmailRecipient;
 import aut.ap.model.User;
+import jakarta.persistence.EntityGraph;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
 
 public class EmailService {
@@ -88,41 +88,51 @@ public class EmailService {
     }
 
     public static List<Email> allEmail(int userId) {
-        return SingletonSessionFactory.get()
-                .fromTransaction(session ->
-                        session.createNativeQuery(
-                                        "select e.* from email e " +
-                                                "left join email_recipient er on er.email_id = e.id " +
-                                                "where er.recipient_id = :userId", Email.class
-                                )
-                                .setParameter("userId", userId)
-                                .getResultList()
-                );
+        return SingletonSessionFactory.get().fromTransaction(session -> {
+            EntityGraph<Email> graph = session.createEntityGraph(Email.class);
+            graph.addAttributeNodes("sender");
+
+            return session.createQuery(
+                            "select distinct e from Email e " +
+                                    "join EmailRecipient er on er.email = e " +
+                                    "where er.recipient.id = :userId " +
+                                    "order by e.date desc", Email.class)
+                    .setParameter("userId", userId)
+                    .setHint("javax.persistence.loadgraph", graph)
+                    .getResultList();
+        });
     }
 
     public static List<Email> unreadEmail(int userId) {
-        return SingletonSessionFactory.get()
-                .fromTransaction(session ->
-                        session.createNativeQuery(
-                                        "select e.* from email e " +
-                                                "left join email_recipient er on er.email_id = e.id " +
-                                                "where er.recipient_id = :userId and er.status = 'unread'", Email.class
-                                )
-                                .setParameter("userId", userId)
-                                .getResultList()
-                );
+        return SingletonSessionFactory.get().fromTransaction(session -> {
+            EntityGraph<Email> graph = session.createEntityGraph(Email.class);
+            graph.addAttributeNodes("sender");
+
+            return session.createQuery(
+                            "select distinct e from Email e " +
+                                    "join EmailRecipient er on er.email = e " +
+                                    "where er.recipient.id = :userId and er.status = aut.ap.model.EmailRecipient.Status.unread " +
+                                    "order by e.date desc", Email.class)
+                    .setParameter("userId", userId)
+                    .setHint("javax.persistence.loadgraph", graph)
+                    .getResultList();
+        });
     }
 
     public static List<Email> sentEmail(int userId){
-        return SingletonSessionFactory.get()
-                .fromTransaction(session ->
-                        session.createNativeQuery(
-                                        "select e.* from email e " +
-                                                "where e.sender_id = :userId", Email.class
-                                )
-                                .setParameter("userId", userId)
-                                .getResultList()
-                );
+        return SingletonSessionFactory.get().fromTransaction(session -> {
+            EntityGraph<Email> graph = session.createEntityGraph(Email.class);
+            graph.addAttributeNodes("sender");
+
+            return session.createQuery(
+                            "select distinct e from Email e " +
+                                    "join EmailRecipient er on er.email = e " +
+                                    "where e.sender.id = :userId " +
+                                    "order by e.date desc", Email.class)
+                    .setParameter("userId", userId)
+                    .setHint("javax.persistence.loadgraph", graph)
+                    .getResultList();
+        });
     }
 
     public static String replyEmail(User sender, String code, String body) {
@@ -224,19 +234,15 @@ public class EmailService {
         throw new RuntimeException("you can not forward email");
     }
 
-    public static List<String> findRecipients(Email email) {
-        List<EmailRecipient> recipientsList = SingletonSessionFactory.get()
+    public static List findRecipients(Email email) {
+        return SingletonSessionFactory.get()
                 .fromTransaction(session ->
-                        session.createNativeQuery("select * from email_recipient where email_id = :emailId", EmailRecipient.class)
+                        session.createNativeQuery("select u.email from email_recipient er " +
+                                        "left join users u on er.recipient_id = u.id " +
+                                        "where er.email_id = :emailId")
                                 .setParameter("emailId", email.getId())
                                 .getResultList()
                 );
-        List<String> emailAddress = new ArrayList<>();
-        for (EmailRecipient recipient : recipientsList) {
-            emailAddress.add(recipient.getRecipient().getEmail());
-        }
-
-        return emailAddress;
     }
 
 

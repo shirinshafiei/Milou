@@ -31,7 +31,7 @@ public class Main {
                     return;
             }
         } finally {
-            Runtime.getRuntime().addShutdownHook(new Thread(SingletonSessionFactory::close));
+           SingletonSessionFactory.close();
         }
     }
 }

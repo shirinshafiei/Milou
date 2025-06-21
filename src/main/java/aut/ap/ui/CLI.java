@@ -178,11 +178,10 @@ public class CLI {
 
     private void sentEmailsCommand(User user) {
         List<Email> sentEmails = sentEmail(user.getId());
-        sentEmails.sort(Comparator.comparing(Email::getDate).reversed());
         System.out.println("sent Email: ");
 
         for (Email e : sentEmails) {
-            List<String> emailRecipients = findRecipients(e);
+            List emailRecipients = findRecipients(e);
             System.out.println("- " + emailRecipients + " - " + e.getSubject() + " (" + e.getCode() + ")");
         }
     }
@@ -193,7 +192,7 @@ public class CLI {
 
         try {
             Email email = readEmailByCode(code, user.getId());
-            List<String> emailAddresses = findRecipients(email);
+            List emailAddresses = findRecipients(email);
 
             System.out.println("Code: " + code);
             System.out.println("Recipient(s): " + String.join(", ", emailAddresses));

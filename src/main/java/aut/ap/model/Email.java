@@ -2,6 +2,7 @@ package aut.ap.model;
 
 import aut.ap.framwork.MilouEntity;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Fetch;
 
 import java.util.Date;
 
@@ -13,7 +14,7 @@ public class Email extends MilouEntity {
      @Temporal(TemporalType.TIMESTAMP)
      private Date date;
      @JoinColumn(name = "sender_id")
-     @ManyToOne(optional = false)
+     @ManyToOne(optional = false, fetch = FetchType.LAZY)
      private User sender;
      @Basic(optional = false)
      private String subject;
