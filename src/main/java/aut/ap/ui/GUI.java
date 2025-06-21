@@ -491,6 +491,7 @@ public class GUI extends JFrame {
     }
 
     private void showEmailViewPanel(Email email) {
+        currentEmail = email;
         JPanel viewPanel = (JPanel) cards.getComponent(5); // VIEW_EMAIL panel
 
         JLabel fromLabel = (JLabel) viewPanel.getClientProperty("fromLabel");
@@ -501,7 +502,7 @@ public class GUI extends JFrame {
 
         fromLabel.setText("From: " + email.getSender().getEmail());
 
-        List<String> recipients = EmailService.findRecipients(email);
+        List recipients = findRecipients(email);
         toLabel.setText("To: " + String.join(", ", recipients));
 
         subjectLabel.setText("Subject: " + email.getSubject());
@@ -513,6 +514,7 @@ public class GUI extends JFrame {
         viewPanel.putClientProperty("currentEmail", email);
 
         cardLayout.show(cards, "VIEW_EMAIL");
+
     }
 
     private void replyToEmail(Email original) {
@@ -531,15 +533,6 @@ public class GUI extends JFrame {
             // Set subject with "Re: " prefix
             subjectField.setText(original.getSubject().startsWith("Re: ") ?
                     original.getSubject() : "Re: " + original.getSubject());
-
-            // Quote original message
-            String originalBody = "\n\n---------- Original Message ----------\n" +
-                    "From: " + original.getSender().getEmail() + "\n" +
-                    "Date: " + original.getDate() + "\n" +
-                    "Subject: " + original.getSubject() + "\n\n" +
-                    original.getBody();
-
-            bodyArea.setText(originalBody);
 
             // Show compose panel and position cursor at top
             cardLayout.show(cards, "COMPOSE");
@@ -564,17 +557,6 @@ public class GUI extends JFrame {
             // Set subject with "Fwd: " prefix
             subjectField.setText(original.getSubject().startsWith("Fwd: ") ?
                     original.getSubject() : "Fwd: " + original.getSubject());
-
-            // Quote original message with full headers
-            List<String> originalRecipients = EmailService.findRecipients(original);
-            String originalBody = "\n\n---------- Forwarded Message ----------\n" +
-                    "From: " + original.getSender().getEmail() + "\n" +
-                    "Date: " + original.getDate() + "\n" +
-                    "Subject: " + original.getSubject() + "\n" +
-                    "To: " + String.join(", ", originalRecipients) + "\n\n" +
-                    original.getBody();
-
-            bodyArea.setText(originalBody);
 
             // Show compose panel and focus on recipients field
             cardLayout.show(cards, "COMPOSE");
